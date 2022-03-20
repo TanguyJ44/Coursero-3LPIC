@@ -43,14 +43,14 @@ public class ExecScript {
             String output = null;
 
             while ((output = stdInput.readLine()) != null) {
-                System.out.println("Retourne : " + output);
-                System.out.println("Attendu  : " + res);
+                System.out.println("Return : " + output);
+                System.out.println("Expected  : " + res);
 
                 if (output.equals(res)) {
-                    System.out.println("OK");
+                    System.out.println("Result : OK");
                     gradeResult = 1;
                 } else {
-                    System.out.println("KO");
+                    System.out.println("Result : KO");
                     gradeResult = 0;
                 }
             }

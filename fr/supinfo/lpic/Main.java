@@ -36,6 +36,7 @@ public class Main {
         ExercisesData.onInit();
 
         if (MysqlManager.onInit()) {
+            System.out.println("[OK] Successful connection to the database !");
             searchNewFile();
         } else {
             System.err.println("[!] An error has occurred : <MYSQL DB>");
@@ -45,6 +46,8 @@ public class Main {
 
     public static void searchNewFile() {
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
+        System.out.println("\nWaiting for new file to be corrected ...");
 
         Runnable searchRunnable = new Runnable() {
             public void run() {
@@ -59,6 +62,7 @@ public class Main {
                     workFile = pathNames[0];
                     workName = workFile.substring(0, workFile.indexOf("."));
 
+                    System.out.println("New file found : " + workFile);
                     moveFileInWorkFolder();
                 }
             }
@@ -70,21 +74,29 @@ public class Main {
         try {
             Files.move(Paths.get(WAIT_FOLDER + "/" + workFile), Paths.get(WORK_FOLDER + "/" + workFile));
 
+            System.out.println("Copy the file to its execution environment");
+
             checkIfFileIsValid();
         } catch (IOException e) {
+            System.out.println("Error when copying the file to its execution environment !");
             e.printStackTrace();
         }
     }
 
     public static void checkIfFileIsValid() {
         ArrayList<Integer> getExercise = MysqlManager.getExerciseInfo(workName);
+
+        System.out.println("Checking the validity of the file ...");
+
         if (getExercise != null) {
             gradeId = getExercise.get(0);
             courseId = getExercise.get(1);
             workLang = getExercise.get(2);
 
+            System.out.println("Valid file !");
             analyzeFileOutput();
         } else {
+            System.out.println("Invalid file !");
             removeFile();
         }
     }
@@ -94,21 +106,29 @@ public class Main {
         int goodAnswer = 0;
         int totalAnswer = exercise.size();
 
+        System.out.println("Launching the file execution sequences ...");
+
         for (Map.Entry<String[], String> pass : exercise.entrySet()) {
             goodAnswer += ExecScript.onExec(pass.getKey(), pass.getValue());
         }
 
+        System.out.println("End of execution sequences !");
         setUserGrade(gradeId, Math.round((goodAnswer * 20) / totalAnswer));
     }
 
     public static void setUserGrade(int id, int grade) {
         MysqlManager.setExerciseGrade(id, grade);
 
+        System.out.println("New grade assigned to the user : " + grade + "/20");
+
         removeFile();
     }
 
     public static void removeFile() {
         File exercise = new File(WORK_FOLDER + "/" + workFile);
+
+        System.out.println("Deleting the exercise file and resetting program ...");
+
         exercise.delete();
 
         workFile = null;
@@ -116,6 +136,8 @@ public class Main {
         workLang = 0;
         gradeId = 0;
         courseId = 0;
+
+        System.out.println("End of the treatment !");
 
         searchNewFile();
     }
