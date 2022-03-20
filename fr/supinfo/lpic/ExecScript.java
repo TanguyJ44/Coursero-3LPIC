@@ -10,9 +10,11 @@ public class ExecScript {
         String[] commands;
 
         if (Main.workLang == 1) {
-            commands = new String[args.length + 1];
+            commands = new String[args.length + 2];
 
-            commands[0] = Main.WORK_FOLDER + "/" + Main.workFile;
+            commands[0] = "wine";
+
+            commands[1] = Main.WORK_FOLDER + "/" + Main.workFile;
 
             for (int i = 0; i < args.length; i++) {
                 commands[i+1] = String.valueOf(args[i]);
@@ -20,7 +22,7 @@ public class ExecScript {
         } else {
             commands = new String[args.length + 2];
 
-            commands[0] = "python.exe";
+            commands[0] = "python";
 
             commands[1] = Main.WORK_FOLDER + "/" + Main.workFile;
 
